@@ -241,10 +241,11 @@ while True:
             danydzien = input("Proszę podać dzien:")
         if danydzien not in data[danyrok][danymiesiac]:
             print("W tym dniu nie ma zajęć!")
-        if grupa != " ":
-            print(ladniewyswietldzien(data, grupa[-5:-1], danyrok, danymiesiac, danydzien))
         else:
-            print(brzydkowyswietldzien(data[danyrok][danymiesiac][danydzien], danyrok, danymiesiac, danydzien))
+            if grupa != " ":
+                print(ladniewyswietldzien(data, grupa[-5:-1], danyrok, danymiesiac, danydzien))
+            else:
+                print(brzydkowyswietldzien(data[danyrok][danymiesiac][danydzien], danyrok, danymiesiac, danydzien))
     elif ans == "4":
         for lata, wartoscilat in data.items():
             for miesiace, wartoscimiesiecy in wartoscilat.items():
