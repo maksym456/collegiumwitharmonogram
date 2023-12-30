@@ -4,118 +4,117 @@ import json
 import termtables as tt
 import SaveToJson
 import os.path
-
 if not os.path.exists("plan.json"):
     print("Nie wykryto pliku! Automatyczna synchronizacja...")
-    SaveToJson.savetojson()
+    SaveToJson.saveToJson()
 
 
-def ktorydzientygodnia(danydzientygodnia):
-    if danydzientygodnia == 0:
-        danydzientygodnia = "Poniedziałek"
-    elif danydzientygodnia == 1:
-        danydzientygodnia = "Wtorek"
-    elif danydzientygodnia == 2:
-        danydzientygodnia = "Środa"
-    elif danydzientygodnia == 3:
-        danydzientygodnia = "Czwartek"
-    elif danydzientygodnia == 4:
-        danydzientygodnia = "Piątek"
-    elif danydzientygodnia == 5:
-        danydzientygodnia = "Sobota"
-    elif danydzientygodnia == 6:
-        danydzientygodnia = "Niedziela"
-    return str(danydzientygodnia)
+def whichDayOfWeek(givenDayOfWeek):
+    if givenDayOfWeek == 0:
+        givenDayOfWeek = "Poniedziałek"
+    elif givenDayOfWeek == 1:
+        givenDayOfWeek = "Wtorek"
+    elif givenDayOfWeek == 2:
+        givenDayOfWeek = "Środa"
+    elif givenDayOfWeek == 3:
+        givenDayOfWeek = "Czwartek"
+    elif givenDayOfWeek == 4:
+        givenDayOfWeek = "Piątek"
+    elif givenDayOfWeek == 5:
+        givenDayOfWeek = "Sobota"
+    elif givenDayOfWeek == 6:
+        givenDayOfWeek = "Niedziela"
+    return str(givenDayOfWeek)
 
 
-def ktorymiesiac(ktorytomiesiac):
-    ktorytomiesiac = int(ktorytomiesiac)
-    if ktorytomiesiac == 1:
-        ktorytomiesiac = "Styczeń"
-    elif ktorytomiesiac == 2:
-        ktorytomiesiac = "Luty"
-    elif ktorytomiesiac == 3:
-        ktorytomiesiac = "Marzec"
-    elif ktorytomiesiac == 4:
-        ktorytomiesiac = "Kwiecień"
-    elif ktorytomiesiac == 5:
-        ktorytomiesiac = "Maj"
-    elif ktorytomiesiac == 6:
-        ktorytomiesiac = "Czerwiec"
-    elif ktorytomiesiac == 7:
-        ktorytomiesiac = "Lipiec"
-    elif ktorytomiesiac == 8:
-        ktorytomiesiac = "Sierpień"
-    elif ktorytomiesiac == 9:
-        ktorytomiesiac = "Wrzesień"
-    elif ktorytomiesiac == 10:
-        ktorytomiesiac = "Październik"
-    elif ktorytomiesiac == 11:
-        ktorytomiesiac = "Listopad"
-    elif ktorytomiesiac == 12:
-        ktorytomiesiac = "Grudzień"
+def whichMonth(whichMonth):
+    whichMonth = int(whichMonth)
+    if whichMonth == 1:
+        whichMonth = "Styczeń"
+    elif whichMonth == 2:
+        whichMonth = "Luty"
+    elif whichMonth == 3:
+        whichMonth = "Marzec"
+    elif whichMonth == 4:
+        whichMonth = "Kwiecień"
+    elif whichMonth == 5:
+        whichMonth = "Maj"
+    elif whichMonth == 6:
+        whichMonth = "Czerwiec"
+    elif whichMonth == 7:
+        whichMonth = "Lipiec"
+    elif whichMonth == 8:
+        whichMonth = "Sierpień"
+    elif whichMonth == 9:
+        whichMonth = "Wrzesień"
+    elif whichMonth == 10:
+        whichMonth = "Październik"
+    elif whichMonth == 11:
+        whichMonth = "Listopad"
+    elif whichMonth == 12:
+        whichMonth = "Grudzień"
     else:
-        ktorytomiesiac = "miesiac"
-    return str(ktorytomiesiac)
+        whichMonth = "miesiac"
+    return str(whichMonth)
 
 
-def ladniewyswietldzien(calyjson, wybranagrupa, rok, miesiac, dzien):
+def nicelyDisplayDay(jsonData, selectedGroup, year, month, day):
     print("\n")
-    maxdlugosc = 47
-    dzientygodnia = ktorydzientygodnia(date(int(rok), int(miesiac), int(dzien)).weekday())
-    nazwamiesiaca = ktorymiesiac(date(int(rok), int(miesiac), int(dzien)).month)
-    tabelka = []
-    datajakas = str(dzientygodnia + ", " + dzien + " " + nazwamiesiaca + " " + rok)
-    header = [wybranagrupa, datajakas]
-    previousday = calyjson[rok][miesiac][dzien]["08:15-09:45"][wybranagrupa]
-    przedmiot = previousday["Przedmiot"]
-    if maxdlugosc > len(przedmiot):
-        for i in range(maxdlugosc - len(przedmiot)):
-            przedmiot += " "
-    previoushour = "09:45"
-    row = ["08:15", przedmiot]
-    tabelka.append(row)
+    maxLength = 47
+    dayOfWeek = whichDayOfWeek(date(int(year), int(month), int(day)).weekday())
+    monthName = whichMonth(date(int(year), int(month), int(day)).month)
+    table = []
+    dateAsString = str(dayOfWeek + ", " + day + " " + monthName + " " + year)
+    header = [selectedGroup, dateAsString]
+    previousDay = jsonData[year][month][day]["08:15-09:45"][selectedGroup]
+    subject = previousDay["Przedmiot"]
+    if maxLength > len(subject):
+        for i in range(maxLength - len(subject)):
+            subject += " "
+    previousHour = "09:45"
+    row = ["08:15", subject]
+    table.append(row)
     tt.print(
-        tabelka,
+        table,
         header=header,
         padding=(0, 1),
         style=tt.styles.markdown
     )
-    skipfirst = True
-    for godzina, dane in calyjson[rok][miesiac][dzien].items():
-        if skipfirst:
-            skipfirst = False
+    skipFirst = True
+    for hour, data in jsonData[year][month][day].items():
+        if skipFirst:
+            skipFirst = False
             continue
-        salawykladowca = previousday["Sala"] + " " + previousday["Wykladowca"]
-        previousday = dane[wybranagrupa]
-        if maxdlugosc > len(salawykladowca):
-            for i in range(maxdlugosc - len(salawykladowca)):
-                salawykladowca += " "
-        header = [previoushour, salawykladowca]
-        previoushour = godzina[-5:]
-        tabelka = []
-        przedmiot = dane[wybranagrupa]["Przedmiot"]
-        if maxdlugosc > len(przedmiot):
-            for i in range(maxdlugosc - len(przedmiot)):
-                przedmiot += " "
-        row = [godzina[:5], przedmiot]
-        tabelka.append(row)
+        roomLecturer = previousDay["Sala"] + " " + previousDay["Wykladowca"]
+        previousDay = data[selectedGroup]
+        if maxLength > len(roomLecturer):
+            for i in range(maxLength - len(roomLecturer)):
+                roomLecturer += " "
+        header = [previousHour, roomLecturer]
+        previousHour = hour[-5:]
+        table = []
+        subject = data[selectedGroup]["Przedmiot"]
+        if maxLength > len(subject):
+            for i in range(maxLength - len(subject)):
+                subject += " "
+        row = [hour[:5], subject]
+        table.append(row)
         tt.print(
-            tabelka,
+            table,
             header=header,
             padding=(0, 1),
             style=tt.styles.markdown
         )
-    salawykladowca = previousday["Sala"] + " " + previousday["Wykladowca"]
-    if maxdlugosc > len(salawykladowca):
-        for i in range(maxdlugosc - len(salawykladowca)):
-            salawykladowca += " "
-    header = [previoushour, salawykladowca]
-    tabelka = []
-    row = [wybranagrupa, "Koniec zajęć"]
-    tabelka.append(row)
+    roomLecturer = previousDay["Sala"] + " " + previousDay["Wykladowca"]
+    if maxLength > len(roomLecturer):
+        for i in range(maxLength - len(roomLecturer)):
+            roomLecturer += " "
+    header = [previousHour, roomLecturer]
+    table = []
+    row = [selectedGroup, "Koniec zajęć"]
+    table.append(row)
     tt.print(
-        tabelka,
+        table,
         header=header,
         padding=(0, 1),
         style=tt.styles.markdown
@@ -123,42 +122,30 @@ def ladniewyswietldzien(calyjson, wybranagrupa, rok, miesiac, dzien):
     return "\n"
 
 
-def brzydkowyswietldzien(daneztegodnia, rok, miesiac, dzien):
-    tabelka = []
-    dzientygodnia = ktorydzientygodnia(date(int(rok), int(miesiac), int(dzien)).weekday())
-    nazwamiesiaca = ktorymiesiac(miesiac)
-    header = [dzientygodnia + ", " + dzien + " " + nazwamiesiaca + " " + rok, "Przedmiot", "Wykladowca", "Sala",
-              "Przedmiot",
-              "Wykladowca", "Sala", "Przedmiot",
-              "Wykladowca",
-              "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot",
-              "Wykladowca",
-              "Sala",
-              "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala"]
-    row = ["Grupa", "1(1)", "1(1)", "1(1)",
-           "1(2)", "1(2)", "1(2)",
-           "2(1)", "2(1)",
-           "2(1)", "2(2)", "2(2)", "2(2)",
-           "3(1)", "3(1)", "3(1)", "3(2)",
-           "3(2)", "3(2)", "4(1)", "4(1)",
-           "4(1)", "4(2)", "4(2)", "4(2)"]
-    tabelka.append(row)
-    for godziny, wartosci in daneztegodnia.items():
-        row = [godziny, wartosci["1(1)"]["Przedmiot"], wartosci["1(1)"]["Wykladowca"],
-               wartosci["1(1)"]["Sala"],
-               wartosci["1(2)"]["Przedmiot"], wartosci["1(2)"]["Wykladowca"], wartosci["1(2)"]["Sala"],
-               wartosci["2(1)"]["Przedmiot"], wartosci["2(1)"]["Wykladowca"],
-               wartosci["2(1)"]["Sala"], wartosci["2(2)"]["Przedmiot"], wartosci["2(2)"]["Wykladowca"],
-               wartosci["2(2)"]["Sala"],
-               wartosci["3(1)"]["Przedmiot"], wartosci["3(1)"]["Wykladowca"], wartosci["3(1)"]["Sala"],
-               wartosci["3(2)"]["Przedmiot"],
-               wartosci["3(2)"]["Wykladowca"], wartosci["3(2)"]["Sala"], wartosci["4(1)"]["Przedmiot"],
-               wartosci["4(1)"]["Wykladowca"],
-               wartosci["4(1)"]["Sala"], wartosci["4(2)"]["Przedmiot"], wartosci["4(2)"]["Wykladowca"],
-               wartosci["4(2)"]["Sala"]]
-        tabelka.append(row)
+def poorlyDisplayDay(dataOfTheDay, year, month, day):
+    table = []
+    dayOfWeek = whichDayOfWeek(date(int(year), int(month), int(day)).weekday())
+    monthName = whichMonth(month)
+    header = [dayOfWeek + ", " + day + " " + monthName + " " + year, "Przedmiot", "Wykladowca", "Sala",
+              "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala", "Przedmiot", "Wykladowca", "Sala"]
+    row = ["Grupa", "1(1)", "1(1)", "1(1)", "1(2)", "1(2)", "1(2)", "2(1)", "2(1)", "2(1)", "2(2)", "2(2)", "2(2)", "3(1)", "3(1)", "3(1)", "3(2)", "3(2)", "3(2)", "4(1)", "4(1)", "4(1)", "4(2)", "4(2)", "4(2)"]
+    table.append(row)
+    for hours, values in dataOfTheDay.items():
+        row = [hours, values["1(1)"]["Przedmiot"], values["1(1)"]["Wykladowca"],
+               values["1(1)"]["Sala"],
+               values["1(2)"]["Przedmiot"], values["1(2)"]["Wykladowca"], values["1(2)"]["Sala"],
+               values["2(1)"]["Przedmiot"], values["2(1)"]["Wykladowca"],
+               values["2(1)"]["Sala"], values["2(2)"]["Przedmiot"], values["2(2)"]["Wykladowca"],
+               values["2(2)"]["Sala"],
+               values["3(1)"]["Przedmiot"], values["3(1)"]["Wykladowca"], values["3(1)"]["Sala"],
+               values["3(2)"]["Przedmiot"],
+               values["3(2)"]["Wykladowca"], values["3(2)"]["Sala"], values["4(1)"]["Przedmiot"],
+               values["4(1)"]["Wykladowca"],
+               values["4(1)"]["Sala"], values["4(2)"]["Przedmiot"], values["4(2)"]["Wykladowca"],
+               values["4(2)"]["Sala"]]
+        table.append(row)
     tt.print(
-        tabelka,
+        table,
         header=header,
         padding=(0, 1)
     )
@@ -166,19 +153,19 @@ def brzydkowyswietldzien(daneztegodnia, rok, miesiac, dzien):
 
 
 f = open('plan.json', "r")
-data = json.loads(f.read())
+jsonData = json.loads(f.read())
 f.close()
-grupa = " "
+group = " "
 while True:
-    print('PLAN LEKCJI 1 SEMESTR' + grupa + 'KIERUNEK INFORMATYKA COLLEGIUM WITELONA')
+    print('PLAN LEKCJI 1 SEMESTR' + group + 'KIERUNEK INFORMATYKA COLLEGIUM WITELONA')
     print("1: Wybierz grupe")
     print("2: Plan lekcji na dziś")
     print("3: Plan lekcji na konkretny dzień")
     print("4: Plan lekcji na cały semestr")
     print("5: Zsynchronizuj plan lekcji ze strony")
     print("6: Wyjście")
-    ans = input()
-    if ans == "1":
+    answer = input()
+    if answer == "1":
         while True:
             print("Dostępne opcje:")
             print("1(1)")
@@ -190,75 +177,83 @@ while True:
             print("4(1)")
             print("4(2)")
             print("r: Reset grupy")
-            ans = input()
-            if ans == "1(1)":
-                grupa = " GRUPA 1(1) "
+            answer = input()
+            if answer == "1(1)":
+                group = " GRUPA 1(1) "
                 break
-            elif ans == "1(2)":
-                grupa = " GRUPA 1(2) "
+            elif answer == "1(2)":
+                group = " GRUPA 1(2) "
                 break
-            elif ans == "2(1)":
-                grupa = " GRUPA 2(1) "
+            elif answer == "2(1)":
+                group = " GRUPA 2(1) "
                 break
-            elif ans == "2(2)":
-                grupa = " GRUPA 2(2) "
+            elif answer == "2(2)":
+                group = " GRUPA 2(2) "
                 break
-            elif ans == "3(1)":
-                grupa = " GRUPA 3(1) "
+            elif answer == "3(1)":
+                group = " GRUPA 3(1) "
                 break
-            elif ans == "3(2)":
-                grupa = " GRUPA 3(2) "
+            elif answer == "3(2)":
+                group = " GRUPA 3(2) "
                 break
-            elif ans == "4(1)":
-                grupa = " GRUPA 4(1) "
+            elif answer == "4(1)":
+                group = " GRUPA 4(1) "
                 break
-            elif ans == "4(2)":
-                grupa = " GRUPA 4(2) "
+            elif answer == "4(2)":
+                group = " GRUPA 4(2) "
                 break
-            elif ans == "r":
+            elif answer == "r":
                 print("Grupa zresetowana!")
-                grupa = " "
+                group = " "
                 break
             else:
                 print("Nie ma takiej grupy!")
-    elif ans == "2" or ans == "3":
-        if ans == "2":
-            danyrok = str(date.today().year)
+    elif answer == "2" or answer == "3":
+        if answer == "2":
+            currentYear = str(date.today().year)
         else:
-            danyrok = input("Proszę podać rok:")
-        if danyrok not in data:
+            currentYear = input("Proszę podać rok:")
+        if len(currentYear) < 4:
+            currentYear = "20"+currentYear
+        if currentYear not in jsonData:
             print("Brak danych o planie z tego roku! Wykracza on poza semestr!")
-        if ans == "2":
-            danymiesiac = str(date.today().month)
+            continue
+        if answer == "2":
+            currentMonth = str(date.today().month)
         else:
-            danymiesiac = input("Proszę podać miesiac:")
-        if danymiesiac not in data[danyrok]:
-            print(
-                "Brak danych o planie z tego miesiaca! W tym miesiącu nie ma zajęć, bądź wykracza on poza ten semestr")
-        if ans == "2":
-            danydzien = str(date.today().day)
+            currentMonth = input("Proszę podać miesiac:")
+        if len(currentMonth) < 2:
+            currentMonth = "0"+currentMonth
+        if currentMonth not in jsonData[currentYear]:
+            print("Brak danych o planie z tego miesiaca! W tym miesiącu nie ma zajęć, bądź wykracza on poza ten semestr")
+            continue
+        if answer == "2":
+            currentDay = str(date.today().day)
         else:
-            danydzien = input("Proszę podać dzien:")
-        if danydzien not in data[danyrok][danymiesiac]:
+            currentDay = input("Proszę podać dzien:")
+        if len(currentDay) < 2:
+            currentDay = "0"+currentDay
+        if currentDay not in jsonData[currentYear][currentMonth]:
             print("W tym dniu nie ma zajęć!")
-        if grupa != " ":
-            print(ladniewyswietldzien(data, grupa[-5:-1], danyrok, danymiesiac, danydzien))
+            continue
+        if group != " ":
+            print(nicelyDisplayDay(jsonData, group[-5:-1], currentYear, currentMonth, currentDay))
         else:
-            print(brzydkowyswietldzien(data[danyrok][danymiesiac][danydzien], danyrok, danymiesiac, danydzien))
-    elif ans == "4":
-        for lata, wartoscilat in data.items():
-            for miesiace, wartoscimiesiecy in wartoscilat.items():
-                for dni, wartoscidni in wartoscimiesiecy.items():
-                    if grupa != " ":
-                        print(ladniewyswietldzien(data, grupa[-5:-1], lata, miesiace, dni))
+            print(poorlyDisplayDay(jsonData[currentYear][currentMonth][currentDay], currentYear, currentMonth, currentDay))
+    elif answer == "4":
+        for years, yearValues in jsonData.items():
+            for months, monthValues in yearValues.items():
+                for days, dayValues in monthValues.items():
+                    if group != " ":
+                        print(nicelyDisplayDay(jsonData, group[-5:-1], years, months, days))
                     else:
-                        print(brzydkowyswietldzien(wartoscidni, lata, miesiace, dni))
-        print("TO BYŁA TABELKA DLA" + grupa)
-    elif ans == "5":
+                        print(poorlyDisplayDay(dayValues, years, months, days))
+        print("TO BYŁA TABELKA DLA" + group)
+    elif answer == "5":
         print("to może chwilę potrwać...")
-        SaveToJson.savetojson()
+        SaveToJson.saveToJson()
         print('Zakończono! Plik "plan.json" został zaktualizowany!')
-    elif ans == "6":
+    elif answer == "6":
         print("Miłego dnia!")
         break
     else:

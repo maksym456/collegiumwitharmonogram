@@ -1,57 +1,58 @@
-def savetojson():
-    import requests
-    from lxml import etree
-    import json
+import requests
+from lxml import etree
+import json
 
+
+def saveToJson():
     print('Łączenie ze stroną "http://www.plan.pwsz.legnica.edu.pl/checkSpecjalnoscStac.php?specjalnosc=s1INF"...')
-    api_url = "http://www.plan.pwsz.legnica.edu.pl/checkSpecjalnoscStac.php?specjalnosc=s1INF"
-    response = requests.get(api_url)
+    apiUrl = "http://www.plan.pwsz.legnica.edu.pl/checkSpecjalnoscStac.php?specjalnosc=s1INF"
+    response = requests.get(apiUrl)
     print('Połączono!')
     print('Pobieranie danych do zmiennej...')
-    fullhtml = response.text
-    tree = etree.HTML(fullhtml)
-    path = '/html/body/table[1]/div[2]/'
-    grouped_dates = {}
+    fullHtml = response.text
+    htmlTree = etree.HTML(fullHtml)
+    xpathBase = '/html/body/table[1]/div[2]/'
+    groupedDates = {}
     print('Dane pobrane')
     print('Parsowanie danych...')
-    for tygodnie in range(15):
-        for dni in range(8):
-            dane = tree.xpath(path + 'tr[1]/td/text()')
-            if len(dane) == 0:
-                path = path[:-10]
-                path += '2]/'
+    for week in range(15):
+        for day in range(8):
+            data = htmlTree.xpath(xpathBase + 'tr[1]/td/text()')
+            if len(data) == 0:
+                xpathBase = xpathBase[:-10]
+                xpathBase += '2]/'
                 break
             else:
-                godzina = {}
+                hourData = {}
                 for row in range(7):
-                    table = tree.xpath(path + 'tr[' + str(row + 4) + ']/td/text()')
-                    lekcja = [
-                        {"Przedmiot": table[1], "Wykladowca": table[2], "Sala": table[3]},
-                        {"Przedmiot": table[4], "Wykladowca": table[5], "Sala": table[6]},
-                        {"Przedmiot": table[7], "Wykladowca": table[8], "Sala": table[9]},
-                        {"Przedmiot": table[10], "Wykladowca": table[11], "Sala": table[12]},
-                        {"Przedmiot": table[13], "Wykladowca": table[14], "Sala": table[15]},
-                        {"Przedmiot": table[16], "Wykladowca": table[17], "Sala": table[18]},
-                        {"Przedmiot": table[19], "Wykladowca": table[20], "Sala": table[21]},
-                        {"Przedmiot": table[22], "Wykladowca": table[23], "Sala": table[24]}]
-                    grupa = {
-                        "1(1)": lekcja[0], "1(2)": lekcja[1], "2(1)": lekcja[2], "2(2)": lekcja[3], "3(1)": lekcja[4],
-                        "3(2)": lekcja[5], "4(1)": lekcja[6], "4(2)": lekcja[7]}
-                    godzina[table[0]] = grupa
-                path += 'div[1]/'
-                rok = dane[0][-10:-6]
-                miesiac = dane[0][-5:-3]
-                dzien = dane[0][-2::]
-                if rok not in grouped_dates:
-                    grouped_dates[rok] = {}
-                if miesiac not in grouped_dates[rok]:
-                    grouped_dates[rok][miesiac] = {}
-                grouped_dates[rok][miesiac][dzien] = godzina
+                    tableData = htmlTree.xpath(xpathBase + 'tr[' + str(row + 4) + ']/td/text()')
+                    lesson = [
+                        {"Przedmiot": tableData[1], "Wykladowca": tableData[2], "Sala": tableData[3]},
+                        {"Przedmiot": tableData[4], "Wykladowca": tableData[5], "Sala": tableData[6]},
+                        {"Przedmiot": tableData[7], "Wykladowca": tableData[8], "Sala": tableData[9]},
+                        {"Przedmiot": tableData[10], "Wykladowca": tableData[11], "Sala": tableData[12]},
+                        {"Przedmiot": tableData[13], "Wykladowca": tableData[14], "Sala": tableData[15]},
+                        {"Przedmiot": tableData[16], "Wykladowca": tableData[17], "Sala": tableData[18]},
+                        {"Przedmiot": tableData[19], "Wykladowca": tableData[20], "Sala": tableData[21]},
+                        {"Przedmiot": tableData[22], "Wykladowca": tableData[23], "Sala": tableData[24]}]
+                    group = {
+                        "1(1)": lesson[0], "1(2)": lesson[1], "2(1)": lesson[2], "2(2)": lesson[3], "3(1)": lesson[4],
+                        "3(2)": lesson[5], "4(1)": lesson[6], "4(2)": lesson[7]}
+                    hourData[tableData[0]] = group
+                xpathBase += 'div[1]/'
+                year = data[0][-10:-6]
+                month = data[0][-5:-3]
+                day = data[0][-2::]
+                if year not in groupedDates:
+                    groupedDates[year] = {}
+                if month not in groupedDates[year]:
+                    groupedDates[year][month] = {}
+                groupedDates[year][month][day] = hourData
     print('Dane zparsowane')
     print('Zapisywanie do pliku...')
-    with open("plan.json", "w") as outfile:
-        json.dump(grouped_dates, outfile)
+    with open("schedule.json", "w") as file:
+        json.dump(groupedDates, file)
     print('Zapisano')
     print('Zamykanie pliku...')
-    outfile.close()
+    file.close()
     print('Plik zamknięty, koniec funkcji')
