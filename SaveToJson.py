@@ -7,6 +7,9 @@ def saveToJson():
     print('Łączenie ze stroną "http://www.plan.pwsz.legnica.edu.pl/checkSpecjalnoscStac.php?specjalnosc=s1INF"...')
     apiUrl = "http://www.plan.pwsz.legnica.edu.pl/checkSpecjalnoscStac.php?specjalnosc=s1INF"
     response = requests.get(apiUrl)
+    if response.ok:
+        print("Błąd połączenia! koniec funkcji")
+        return
     print('Połączono!')
     print('Pobieranie danych do zmiennej...')
     fullHtml = response.text

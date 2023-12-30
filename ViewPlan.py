@@ -7,8 +7,8 @@ import os.path
 if not os.path.exists("plan.json"):
     print("Nie wykryto pliku! Automatyczna synchronizacja...")
     SaveToJson.saveToJson()
-
-
+if not os.path.exists("plan.json"):
+    print("Błąd synchronizacji, brak pliku, koniec programu")
 def whichDayOfWeek(givenDayOfWeek):
     if givenDayOfWeek == 0:
         givenDayOfWeek = "Poniedziałek"
@@ -252,7 +252,6 @@ while True:
     elif answer == "5":
         print("to może chwilę potrwać...")
         SaveToJson.saveToJson()
-        print('Zakończono! Plik "plan.json" został zaktualizowany!')
     elif answer == "6":
         print("Miłego dnia!")
         break
