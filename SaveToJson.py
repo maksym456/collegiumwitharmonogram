@@ -50,7 +50,7 @@ def saveToJson():
                 groupedDates[year][month][day] = hourData
     print('Dane zparsowane')
     print('Zapisywanie do pliku...')
-    with open("schedule.json", "w") as file:
+    with open("plan.json", "w") as file:
         json.dump(groupedDates, file)
     print('Zapisano')
     print('Zamykanie pliku...')
